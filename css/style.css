@@ -1,8 +1,9 @@
 #gameCanvas {
   box-shadow: 10px 10px 20px black;
   position: relative;
-  width: 80%;
-  height: auto;
+  width: auto;
+  height: 80%;
+  background-color: black;
 }
 h1 {
   text-align: center;
