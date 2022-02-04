@@ -1,3 +1,5 @@
+import MovingDirection from "/src/MovingDirection.js";
+
 export default class Pacman {
   constructor(x, y, tileWidth, tileHeight, velocity, tileMap) {
     this.x = x;
@@ -13,12 +15,24 @@ export default class Pacman {
     this.defaultAnimationTimer = 10;
     this.animationTimer = null;
 
+    this.chompSound = new Audio("/sounds/pacman_chomp.wav");
+    this.powerDotSound = new Audio("/sounds/pacman_eatfruit.wav");
+    this.powerDotActive = false;
+    this.powerDotAboutToExpire = false;
+    this.timers = [];
+
     this.imageIndex = [2, 0];
+
+    document.addEventListener("keydown", this.#keydown);
 
     this.#loadImages();
   }
 
   draw(ctx) {
+    this.#move();
+    this.#animate();
+    this.#eatDot();
+    this.#eatPowerDot();
     ctx.drawImage(
       this.images[this.imageIndex[0]][this.imageIndex[1]],
       this.x,
@@ -27,7 +41,86 @@ export default class Pacman {
       this.tileHeight
     );
   }
+  // updates coordinates for where the player should get drawn to the canvas
+  #move() {
+    if (this.currentMovingDirection !== this.requestedMovingDirection) {
+      if (
+        Number.isInteger(this.x / this.tileWidth) &&
+        Number.isInteger(this.y / this.tileHeight)
+      ) {
+        console.log(
+          "x: " +
+            this.x +
+            " y: " +
+            this.y +
+            " req: " +
+            this.requestedMovingDirection
+        );
+        if (
+          !this.tileMap.didCollideWithEnvironment(
+            this.x,
+            this.y,
+            this.requestedMovingDirection
+          )
+        ) {
+          this.currentMovingDirection = this.requestedMovingDirection;
+        }
+      }
+    }
+    if (
+      this.tileMap.didCollideWithEnvironment(
+        this.x,
+        this.y,
+        this.currentMovingDirection
+      )
+    ) {
+      this.animationTimer = null;
+      this.imageIndex = [this.currentMovingDirection, 0];
+      return;
+    } else if (
+      this.currentMovingDirection != null &&
+      this.animationTimer == null
+    ) {
+      this.animationTimer = this.defaultAnimationTimer;
+    }
 
+    switch (this.currentMovingDirection) {
+      case MovingDirection.up:
+        this.y -= this.velocity;
+        this.imageIndex[0] = MovingDirection.up;
+        this.imageIndex[1] = 0;
+        break;
+      case MovingDirection.down:
+        this.y += this.velocity;
+        this.imageIndex[0] = MovingDirection.down;
+        break;
+      case MovingDirection.left:
+        this.x -= this.velocity;
+        this.imageIndex[0] = MovingDirection.left;
+        break;
+      case MovingDirection.right:
+        this.x += this.velocity;
+        this.imageIndex[0] = MovingDirection.right;
+        break;
+    }
+  }
+
+  // loops through all images of the player according to the direction he is moving
+  // this creates the animated effect of the player eating his way forward.
+  #animate() {
+    if (this.animationTimer == null) {
+      return;
+    }
+    this.animationTimer--;
+    if (this.animationTimer === 0) {
+      this.animationTimer = this.defaultAnimationTimer;
+      this.imageIndex[1]++;
+      if (this.imageIndex[1] == this.images[this.imageIndex[0]].length) {
+        this.imageIndex[1] = 0;
+      }
+    }
+  }
+  // loads the images of the player and saves them to a 2 dimensional list.
   #loadImages() {
     const down_0 = new Image();
     down_0.src = "/images/pacman/down_0.png";
@@ -65,5 +158,68 @@ export default class Pacman {
       [right_0, right_1, right_2],
       [up],
     ];
+  }
+
+  // used to listen for the pressing of a directional key.
+  #keydown = () => {
+    //up
+    if (event.keyCode == 38) {
+      if (this.currentMovingDirection == MovingDirection.down) {
+        this.currentMovingDirection = MovingDirection.up;
+      }
+      this.requestedMovingDirection = MovingDirection.up;
+    }
+    //down
+    if (event.keyCode == 40) {
+      if (this.currentMovingDirection == MovingDirection.up) {
+        this.currentMovingDirection = MovingDirection.down;
+      }
+      this.requestedMovingDirection = MovingDirection.down;
+    }
+    //left
+    if (event.keyCode == 37) {
+      if (this.currentMovingDirection == MovingDirection.right) {
+        this.currentMovingDirection = MovingDirection.left;
+      }
+      this.requestedMovingDirection = MovingDirection.left;
+    }
+    //right
+    if (event.keyCode == 39) {
+      if (this.currentMovingDirection == MovingDirection.left) {
+        this.currentMovingDirection = MovingDirection.right;
+      }
+      this.requestedMovingDirection = MovingDirection.right;
+    }
+  };
+
+  // checks if player eats a dot and if so plays sound.
+  #eatDot() {
+    if (this.tileMap.eatDot(this.x, this.y)) {
+      this.chompSound.play();
+    }
+  }
+  // checks if player eats a power-dot and if so
+  //plays sound and starts timer for when the effect expires.
+  #eatPowerDot() {
+    if (this.tileMap.eatPowerDot(this.x, this.y)) {
+      this.powerDotSound.play();
+      this.powerDotActive = true;
+      this.powerDotAboutToExpire = false;
+      this.timers.forEach((timer) => clearTimeout(timer));
+      this.timers = [];
+
+      let powerDotTimer = setTimeout(() => {
+        this.powerDotActive = false;
+        this.powerDotAboutToExpire = false;
+      }, 1000 * 6);
+
+      this.timers.push(powerDotTimer);
+
+      let powerDotAboutToExpireTimer = setTimeout(() => {
+        this.powerDotAboutToExpire = true;
+      }, 1000 * 3);
+
+      this.timers.push(powerDotAboutToExpireTimer);
+    }
   }
 }
