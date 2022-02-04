@@ -1,22 +1,21 @@
+import pacman from "./Pacman.js";
+
 export default class TileMap {
-  constructor() {
+  constructor(canvasWidth, canvasHeight) {
+    this.tileWidth = canvasWidth / this.map[0].length;
+    this.tileHeight = canvasHeight / this.map.length;
+
     this.wall = new Image();
     this.wall.src = "/images/walls/wall.png";
 
     this.dot = new Image();
     this.dot.src = "/images/dots/dot.png";
-    this.dot.style.border = "1px solid black";
-    this.dot.style.borderRadius = "50%";
 
     this.powerDot0 = new Image();
     this.powerDot0.src = "/images/dots/power_0.png";
-    this.powerDot0.style.border = "1px solid black";
-    this.powerDot0.style.borderRadius = "50%";
 
     this.powerDot1 = new Image();
     this.powerDot1.src = "/images/dots/power_1.png";
-    this.powerDot1.style.border = "1px solid black";
-    this.powerDot1.style.borderRadius = "50%";
 
     this.powerDot = this.powerDot0;
 
@@ -174,19 +173,35 @@ export default class TileMap {
     ],
   ];
 
-  draw(ctx, canvasWidth, canvasHeight) {
-    let tileWidth = canvasWidth / this.map[0].length;
-    let tileHeight = canvasHeight / this.map.length;
-
+  draw(ctx) {
     for (let row = 0; row < this.map.length; row++) {
       for (let column = 0; column < this.map[row].length; column++) {
         let tile = this.map[row][column];
         if (tile === 0) {
-          this.#drawDot(ctx, column, row, tileWidth, tileHeight);
+          this.#drawDot(ctx, column, row, this.tileWidth, this.tileHeight);
         } else if (tile === 1) {
-          this.#drawWall(ctx, column, row, tileWidth, tileHeight);
+          this.#drawWall(ctx, column, row, this.tileWidth, this.tileHeight);
         } else if (tile === 2) {
-          this.#drawPowerDot(ctx, column, row, tileWidth, tileHeight);
+          this.#drawPowerDot(ctx, column, row, this.tileWidth, this.tileHeight);
+        }
+      }
+    }
+  }
+
+  getPacman(velocity) {
+    for (let row = 0; row < this.map.length; row++) {
+      for (let column = 0; column < this.map[row].length; column++) {
+        let tile = this.map[row][column];
+        if (tile === 4) {
+          console.log(column + " " + row);
+          return new pacman(
+            column * this.tileWidth,
+            row * this.tileHeight,
+            this.tileWidth,
+            this.tileHeight,
+            velocity,
+            this
+          );
         }
       }
     }
