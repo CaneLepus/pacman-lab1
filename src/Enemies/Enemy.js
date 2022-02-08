@@ -1,7 +1,7 @@
 import MovingDirection from "/src/MovingDirection.js";
 import State from "/src/State.js";
 
-class Enemy {
+export default class Enemy {
   constructor(x, y, tileWidth, tileHeight, velocity, tileMap) {
     this.x = x;
     this.y = y;
@@ -80,7 +80,7 @@ class Enemy {
     return false;
   }
 
-  #loadImages(imageFolder) {
+  loadImages(imageFolder) {
     const down_0 = new Image();
     down_0.src = `/images/${imageFolder}/down_0.png`;
 

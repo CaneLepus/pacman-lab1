@@ -1,4 +1,5 @@
-import pacman from "/src/Pacman.js";
+import Pacman from "/src/Pacman.js";
+import Blinky from "/src/Enemies/Blinky.js";
 import MovingDirection from "/src/MovingDirection.js";
 
 export default class TileMap {
@@ -29,6 +30,11 @@ export default class TileMap {
   // 2 - power-dot
   // 3 - entry ghost lair
   // 4 - pacman
+  // 5 - blinky
+  // 6 - pinky
+  // 7 - inky
+  // 8 - clyde
+  // 9 - fruit
   map = [
     [
       -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -88,8 +94,8 @@ export default class TileMap {
     ],
 
     [
-      1, 1, 1, 1, 1, 1, 0, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1,
-      0, 1, 1, 1, 1, 1, 1,
+      1, 1, 1, 1, 1, 1, 0, 1, 1, -1, -1, -1, -1, -1, 5, -1, -1, -1, -1, 1, 1, 0,
+      1, 1, 1, 1, 1, 1,
     ],
     [
       1, 1, 1, 1, 1, 1, 0, 1, 1, -1, 1, 1, 1, 3, 3, 1, 1, 1, -1, 1, 1, 0, 1, 1,
@@ -198,8 +204,7 @@ export default class TileMap {
         let tile = this.map[row][column];
         if (tile === 4) {
           this.map[row][column] = -1;
-          console.log(column + " " + row);
-          return new pacman(
+          return new Pacman(
             column * this.tileWidth,
             row * this.tileHeight,
             this.tileWidth,
@@ -210,6 +215,29 @@ export default class TileMap {
         }
       }
     }
+  }
+
+  getEnemies(velocity) {
+    let enemies = [];
+    for (let row = 0; row < this.map.length; row++) {
+      for (let column = 0; column < this.map[row].length; column++) {
+        let tile = this.map[row][column];
+        if (tile === 5) {
+          this.map[row][column] = -1;
+          enemies.push(
+            new Blinky(
+              column * this.tileWidth,
+              row * this.tileHeight,
+              this.tileWidth,
+              this.tileHeight,
+              velocity,
+              this
+            )
+          );
+        }
+      }
+    }
+    return enemies;
   }
 
   // returns true if the entity (player or ghost) where to collide with a wall if they
