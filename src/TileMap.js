@@ -23,6 +23,7 @@ export default class TileMap {
 
     this.powerDotAnimationTimerDefault = 60;
     this.powerDotAnimationTimer = this.powerDotAnimationTimerDefault;
+    this.pacman = null;
   }
   // -1 - blank
   // 0 - dot
@@ -184,9 +185,10 @@ export default class TileMap {
     for (let row = 0; row < this.map.length; row++) {
       for (let column = 0; column < this.map[row].length; column++) {
         let tile = this.map[row][column];
-        if (tile === -1) {
+        if (tile !== 1) {
           this.#drawBlank(ctx, column, row, this.tileWidth, this.tileHeight);
-        } else if (tile === 0) {
+        }
+        if (tile === 0) {
           this.#drawDot(ctx, column, row, this.tileWidth, this.tileHeight);
         } else if (tile === 1) {
           this.#drawWall(ctx, column, row, this.tileWidth, this.tileHeight);
@@ -204,7 +206,7 @@ export default class TileMap {
         let tile = this.map[row][column];
         if (tile === 4) {
           this.map[row][column] = -1;
-          return new Pacman(
+          this.pacman = new Pacman(
             column * this.tileWidth,
             row * this.tileHeight,
             this.tileWidth,
@@ -212,6 +214,7 @@ export default class TileMap {
             velocity,
             this
           );
+          return this.pacman;
         }
       }
     }
@@ -231,7 +234,8 @@ export default class TileMap {
               this.tileWidth,
               this.tileHeight,
               velocity,
-              this
+              this,
+              this.pacman
             )
           );
         }

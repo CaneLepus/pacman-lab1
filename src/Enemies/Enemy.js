@@ -2,7 +2,7 @@ import MovingDirection from "/src/MovingDirection.js";
 import State from "/src/State.js";
 
 export default class Enemy {
-  constructor(x, y, tileWidth, tileHeight, velocity, tileMap) {
+  constructor(x, y, tileWidth, tileHeight, velocity, tileMap, pacman) {
     this.x = x;
     this.y = y;
     this.tileWidth = tileWidth;
@@ -10,8 +10,7 @@ export default class Enemy {
     this.velocity = velocity;
     this.tileMap = tileMap;
 
-    this.currentMovingDirection = null;
-    this.requestedMovingDirection = null;
+    this.movingDirection = null;
 
     this.defaultAnimationTimer = 10;
     this.animationTimer = null;
@@ -22,6 +21,7 @@ export default class Enemy {
     this.timers = [];
 
     this.imageIndex = [2, 0, 0];
+    this.pacman = pacman;
   }
   draw(ctx) {
     if (this.imageIndex[2] === State.normal) {
@@ -213,7 +213,7 @@ export default class Enemy {
     ];
   }
 
-  #animate() {
+  animate() {
     if (this.animationTimer == null) {
       return;
     }
@@ -231,53 +231,15 @@ export default class Enemy {
     }
   }
 
-  #move() {
-    if (this.currentMovingDirection !== this.requestedMovingDirection) {
-      if (
-        Number.isInteger(this.x / this.tileWidth) &&
-        Number.isInteger(this.y / this.tileHeight)
-      ) {
-        console.log(
-          "x: " +
-            this.x +
-            " y: " +
-            this.y +
-            " req: " +
-            this.requestedMovingDirection
-        );
-        if (
-          !this.tileMap.didCollideWithEnvironment(
-            this.x,
-            this.y,
-            this.requestedMovingDirection
-          )
-        ) {
-          this.currentMovingDirection = this.requestedMovingDirection;
-        }
-      }
-    }
-    if (
-      this.tileMap.didCollideWithEnvironment(
-        this.x,
-        this.y,
-        this.currentMovingDirection
-      )
-    ) {
-      this.animationTimer = null;
-      this.imageIndex = [this.currentMovingDirection, 0];
-      return;
-    } else if (
-      this.currentMovingDirection != null &&
-      this.animationTimer == null
-    ) {
+  move() {
+    if (this.movingDirection != null && this.animationTimer == null) {
       this.animationTimer = this.defaultAnimationTimer;
     }
 
-    switch (this.currentMovingDirection) {
+    switch (this.movingDirection) {
       case MovingDirection.up:
         this.y -= this.velocity;
         this.imageIndex[0] = MovingDirection.up;
-        this.imageIndex[1] = 0;
         break;
       case MovingDirection.down:
         this.y += this.velocity;
@@ -288,13 +250,14 @@ export default class Enemy {
         this.imageIndex[0] = MovingDirection.left;
         break;
       case MovingDirection.right:
+        console.log("moving right");
         this.x += this.velocity;
         this.imageIndex[0] = MovingDirection.right;
         break;
     }
   }
 
-  #setState(ctx, pacman) {
+  #setState(pacman) {
     if (pacman.powerDotActive) {
       if (this.#isPowerDotAboutToExpire(pacman)) {
         this.imageIndex[2] = 3;

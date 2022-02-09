@@ -3,10 +3,11 @@ import MovingDirection from "/src/MovingDirection.js";
 export default function findShortestPath(
   startcoordinates,
   goalCoordinates,
-  grid
+  grid,
+  initialDirection
 ) {
-  let distanceFromTop = startcoordinates[0];
-  let distanceFromLeft = startcoordinates[1];
+  let distanceFromTop = startcoordinates[1];
+  let distanceFromLeft = startcoordinates[0];
 
   let location = {
     distanceFromTop: distanceFromTop,
@@ -16,14 +17,21 @@ export default function findShortestPath(
   };
 
   let queue = [location];
-
+  if (
+    startcoordinates[0] === goalCoordinates[0] &&
+    goalCoordinates[1] === startcoordinates[1]
+  ) {
+    return;
+  }
   while (queue.length > 0) {
     let currentLocation = queue.shift();
 
     let newLocation = exploreInDirection(
       currentLocation,
       MovingDirection.up,
-      grid
+      grid,
+      goalCoordinates,
+      initialDirection
     );
     if (newLocation.status === "Goal") {
       return newLocation.path;
@@ -31,10 +39,12 @@ export default function findShortestPath(
       queue.push(newLocation);
     }
 
-    let newLocation = exploreInDirection(
+    newLocation = exploreInDirection(
       currentLocation,
       MovingDirection.right,
-      grid
+      grid,
+      goalCoordinates,
+      initialDirection
     );
     if (newLocation.status === "Goal") {
       return newLocation.path;
@@ -42,10 +52,12 @@ export default function findShortestPath(
       queue.push(newLocation);
     }
 
-    let newLocation = exploreInDirection(
+    newLocation = exploreInDirection(
       currentLocation,
       MovingDirection.down,
-      grid
+      grid,
+      goalCoordinates,
+      initialDirection
     );
     if (newLocation.status === "Goal") {
       return newLocation.path;
@@ -53,10 +65,12 @@ export default function findShortestPath(
       queue.push(newLocation);
     }
 
-    let newLocation = exploreInDirection(
+    newLocation = exploreInDirection(
       currentLocation,
       MovingDirection.left,
-      grid
+      grid,
+      goalCoordinates,
+      initialDirection
     );
     if (newLocation.status === "Goal") {
       return newLocation.path;
@@ -66,7 +80,7 @@ export default function findShortestPath(
   }
   return false;
 }
-function checkStatus(location, grid) {
+function checkStatus(location, grid, goalCoordinates, initialDirection) {
   let height = grid.length;
   let width = grid[0].length;
 
@@ -81,15 +95,21 @@ function checkStatus(location, grid) {
     grid[dft][dfl] === 1
   ) {
     return "Invalid";
-  } else if (dft === goalCoordinates[0] && dfl === goalCoordinates[1]) {
+  } else if (dfl === goalCoordinates[0] && dft === goalCoordinates[1]) {
     return "Goal";
-  } else if (grid[dft][dfl] !== 10) {
+  } else if (blocked(grid, location, initialDirection)) {
     return "blocked";
   } else {
     return "Valid";
   }
 }
-function exploreInDirection(currentLocation, direction, grid) {
+function exploreInDirection(
+  currentLocation,
+  direction,
+  grid,
+  goalCoordinates,
+  initialDirection
+) {
   let newPath = currentLocation.path.slice();
   newPath.push(direction);
 
@@ -112,10 +132,46 @@ function exploreInDirection(currentLocation, direction, grid) {
     path: newPath,
     status: "Unknown",
   };
-  newLocation.status = checkStatus(newLocation, grid);
+  newLocation.status = checkStatus(
+    newLocation,
+    grid,
+    goalCoordinates,
+    initialDirection
+  );
 
   if (newLocation.status === "Valid") {
     grid[newLocation.distanceFromTop][newLocation.distanceFromLeft] = 10;
   }
   return newLocation;
+}
+function blocked(grid, location, initialDirection) {
+  let dft = location.distanceFromTop;
+  let dfl = location.distanceFromLeft;
+  console.log("1: " + location.path.at(-1));
+  console.log("2: " + location.path.at(-2));
+  if (grid[dft][dfl] === 10) {
+    return true;
+  } else if (
+    (location.path[0] === 1 && initialDirection === 2) ||
+    (location.path[0] === 2 && initialDirection === 1) ||
+    (location.path[0] === 0 && initialDirection === 3) ||
+    (location.path[0] === 3 && initialDirection === 0)
+  ) {
+    return true;
+  } else if (
+    (location.path[location.path.length - 1] === 1 &&
+      location.path[location.path.length - 2] === 2) ||
+    (location.path[location.path.length - 2] === 1 &&
+      location.path[location.path.length - 1] === 2)
+  ) {
+    return true;
+  } else if (
+    (location.path[location.path.length - 1] === 3 &&
+      location.path[location.path.length - 2] === 0) ||
+    (location.path[location.path.length - 2] === 3 &&
+      location.path[location.path.length - 1] === 0)
+  ) {
+    return true;
+  }
+  return false;
 }
