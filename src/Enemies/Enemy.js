@@ -214,19 +214,17 @@ export default class Enemy {
   }
 
   animate() {
-    if (this.animationTimer == null) {
+    if (this.animationTimer === null) {
       return;
     }
     this.animationTimer--;
     if (this.animationTimer === 0) {
       this.animationTimer = this.defaultAnimationTimer;
-      if (!this.imageIndex[2] === State.dead) {
+      if (!(this.imageIndex[2] === State.dead)) {
         this.imageIndex[1]++;
         if (this.imageIndex[1] == this.images[this.imageIndex[0]].length) {
           this.imageIndex[1] = 0;
         }
-      } else {
-        this.imageIndex[1] = 0;
       }
     }
   }
