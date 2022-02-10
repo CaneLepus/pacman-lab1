@@ -2,6 +2,7 @@ import Pacman from "/src/Pacman.js";
 import Blinky from "/src/Enemies/Blinky.js";
 import Pinky from "/src/Enemies/Pinky.js";
 import Inky from "/src/Enemies/Inky.js";
+import Clyde from "/src/Enemies/clyde.js";
 import MovingDirection from "/src/MovingDirection.js";
 
 export default class TileMap {
@@ -109,7 +110,7 @@ export default class TileMap {
       -1, -1, 0, -1, -1, -1, -1, -1, -1,
     ],
     [
-      1, 1, 1, 1, 1, 1, 0, 1, 1, -1, 1, -1, 7, 6, -1, -1, -1, 1, -1, 1, 1, 0, 1,
+      1, 1, 1, 1, 1, 1, 0, 1, 1, -1, 1, -1, 7, 6, 8, -1, -1, 1, -1, 1, 1, 0, 1,
       1, 1, 1, 1, 1,
     ],
     [
@@ -263,6 +264,18 @@ export default class TileMap {
               this,
               this.pacman,
               blinky
+            )
+          );
+        } else if (tile === 8) {
+          enemies.push(
+            new Clyde(
+              column * this.tileWidth,
+              row * this.tileHeight,
+              this.tileWidth,
+              this.tileHeight,
+              velocity,
+              this,
+              this.pacman
             )
           );
         }

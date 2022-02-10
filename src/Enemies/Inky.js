@@ -77,7 +77,6 @@ export default class Inky extends Enemy {
       goalX = this.goal[0];
       goalY = this.goal[1];
 
-      console.log(goalX + ", " + goalY);
       this.goal = this.findValid(goalX, goalY, blinkyDiffX + 2, blinkyDiffY);
 
       goalX = this.goal[0];
@@ -98,7 +97,6 @@ export default class Inky extends Enemy {
       goalX = this.goal[0];
       goalY = this.goal[1];
 
-      console.log(goalX + ", " + goalY);
       this.goal = this.findValid(goalX, goalY, blinkyDiffX - 2, blinkyDiffY);
 
       goalX = this.goal[0];
@@ -118,7 +116,6 @@ export default class Inky extends Enemy {
       goalX = this.goal[0];
       goalY = this.goal[1];
 
-      console.log(goalX + ", " + goalY);
       this.goal = this.findValid(goalX, goalY, blinkyDiffX, blinkyDiffY - 2);
 
       goalX = this.goal[0];
@@ -137,7 +134,6 @@ export default class Inky extends Enemy {
       goalX = this.goal[0];
       goalY = this.goal[1];
 
-      console.log(goalX + ", " + goalY);
       this.goal = this.findValid(goalX, goalY, blinkyDiffX, blinkyDiffY + 2);
 
       goalX = this.goal[0];
