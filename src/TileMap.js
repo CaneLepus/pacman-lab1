@@ -1,6 +1,7 @@
 import Pacman from "/src/Pacman.js";
 import Blinky from "/src/Enemies/Blinky.js";
 import Pinky from "/src/Enemies/Pinky.js";
+import Inky from "/src/Enemies/Inky.js";
 import MovingDirection from "/src/MovingDirection.js";
 
 export default class TileMap {
@@ -108,8 +109,8 @@ export default class TileMap {
       -1, -1, 0, -1, -1, -1, -1, -1, -1,
     ],
     [
-      1, 1, 1, 1, 1, 1, 0, 1, 1, -1, 1, -1, -1, 6, -1, -1, -1, 1, -1, 1, 1, 0,
-      1, 1, 1, 1, 1, 1,
+      1, 1, 1, 1, 1, 1, 0, 1, 1, -1, 1, -1, 7, 6, -1, -1, -1, 1, -1, 1, 1, 0, 1,
+      1, 1, 1, 1, 1,
     ],
     [
       1, 1, 1, 1, 1, 1, 0, 1, 1, -1, 1, 1, 1, 1, 1, 1, 1, 1, -1, 1, 1, 0, 1, 1,
@@ -222,23 +223,23 @@ export default class TileMap {
   }
 
   getEnemies(velocity) {
+    let blinky = null;
     let enemies = [];
     for (let row = 0; row < this.map.length; row++) {
       for (let column = 0; column < this.map[row].length; column++) {
         let tile = this.map[row][column];
         if (tile === 5) {
           this.map[row][column] = -1;
-          enemies.push(
-            new Blinky(
-              column * this.tileWidth,
-              row * this.tileHeight,
-              this.tileWidth,
-              this.tileHeight,
-              velocity,
-              this,
-              this.pacman
-            )
+          blinky = new Blinky(
+            column * this.tileWidth,
+            row * this.tileHeight,
+            this.tileWidth,
+            this.tileHeight,
+            velocity,
+            this,
+            this.pacman
           );
+          enemies.push(blinky);
         } else if (tile === 6) {
           enemies.push(
             new Pinky(
@@ -249,6 +250,19 @@ export default class TileMap {
               velocity,
               this,
               this.pacman
+            )
+          );
+        } else if (tile === 7) {
+          enemies.push(
+            new Inky(
+              column * this.tileWidth,
+              row * this.tileHeight,
+              this.tileWidth,
+              this.tileHeight,
+              velocity,
+              this,
+              this.pacman,
+              blinky
             )
           );
         }

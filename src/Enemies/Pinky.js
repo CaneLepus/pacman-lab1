@@ -16,26 +16,24 @@ export default class Pinky extends Enemy {
   }
 
   move() {
-    // if blinky is entirely inside a tile
+    // if pinky is entirely inside a tile
 
     if (
       Number.isInteger(this.x / this.tileWidth) &&
       Number.isInteger(this.y / this.tileHeight)
     ) {
-      // if there are no future moves in the moves list.
       this.getPath();
+      // if the target tile is not the current
       if (
         !(
           this.goal[0] === this.x / this.tileWidth &&
           this.goal[1] === this.y / this.tileHeight
         )
       ) {
-        // if there are future moves in the moves list
-
         this.movingDirection = this.moves.shift();
       }
     }
-    // if blinky wont collide with a wall by moving in decided direction.
+    // if pinky wont collide with a wall by moving in decided direction.
     if (
       !this.tileMap.didCollideWithEnvironment(
         this.x,
@@ -45,10 +43,8 @@ export default class Pinky extends Enemy {
     )
       super.move();
   }
-  // method that fetches an array of future moves that leads blinky to pacmans current position
+  // method for retrieving the shortest path to pinkys target tile
   getPath() {
-    // if pacman is entirely inside a tile
-
     // set start and goal coordinates
     let start = [this.x / this.tileWidth, this.y / this.tileHeight];
     this.goal = this.getTargetCoordinates();
@@ -59,6 +55,7 @@ export default class Pinky extends Enemy {
     this.moves = PathFinding(start, this.goal, grid, this.movingDirection);
   }
 
+  // method that determines the target tile based on rules for pinkys movement
   getTargetCoordinates() {
     let goalX = 0;
     let goalY = 0;
