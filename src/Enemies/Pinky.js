@@ -1,0 +1,113 @@
+import Enemy from "/src/Enemies/Enemy.js";
+import PathFinding from "/src/PathFinding.js";
+import MovingDirection from "/src/MovingDirection.js";
+
+export default class Pinky extends Enemy {
+  constructor(x, y, tileWidth, tileHeight, velocity, tileMap, pacman) {
+    super(x, y, tileWidth, tileHeight, velocity, tileMap, pacman);
+    this.moves = false;
+    this.goal = [];
+    super.loadImages("pinky");
+  }
+  draw(ctx) {
+    this.move();
+    this.animate();
+    super.draw(ctx);
+  }
+
+  move() {
+    // if blinky is entirely inside a tile
+
+    if (
+      Number.isInteger(this.x / this.tileWidth) &&
+      Number.isInteger(this.y / this.tileHeight)
+    ) {
+      // if there are no future moves in the moves list.
+      this.getPath();
+      if (
+        !(
+          this.goal[0] === this.x / this.tileWidth &&
+          this.goal[1] === this.y / this.tileHeight
+        )
+      ) {
+        // if there are future moves in the moves list
+
+        this.movingDirection = this.moves.shift();
+      }
+    }
+    // if blinky wont collide with a wall by moving in decided direction.
+    if (
+      !this.tileMap.didCollideWithEnvironment(
+        this.x,
+        this.y,
+        this.movingDirection
+      )
+    )
+      super.move();
+  }
+  // method that fetches an array of future moves that leads blinky to pacmans current position
+  getPath() {
+    // if pacman is entirely inside a tile
+
+    // set start and goal coordinates
+    let start = [this.x / this.tileWidth, this.y / this.tileHeight];
+    this.goal = this.getTargetCoordinates();
+    // create a copy of the gameboard grid
+    let grid = JSON.parse(JSON.stringify(this.tileMap.map));
+
+    // populate the moves list with moves
+    this.moves = PathFinding(start, this.goal, grid, this.movingDirection);
+  }
+
+  getTargetCoordinates() {
+    let goalX = 0;
+    let goalY = 0;
+    if (this.pacman.imageIndex[0] === MovingDirection.right) {
+      goalX = Math.round(this.pacman.x / this.tileWidth + 4);
+      goalY = Math.round(this.pacman.y / this.tileHeight);
+      while (
+        this.tileMap.map[goalY][goalX] === 1 ||
+        this.tileMap.map[goalY][goalX] === undefined
+      ) {
+        goalX--;
+      }
+    } else if (this.pacman.imageIndex[0] === MovingDirection.left) {
+      goalX = Math.round(this.pacman.x / this.tileWidth - 4);
+      goalY = Math.round(this.pacman.y / this.tileHeight);
+      while (
+        this.tileMap.map[goalY][goalX] === 1 ||
+        this.tileMap.map[goalY][goalX] === undefined
+      ) {
+        goalX++;
+      }
+    } else if (this.pacman.imageIndex[0] === MovingDirection.up) {
+      goalX = Math.round(this.pacman.x / this.tileWidth);
+      goalY = Math.round(this.pacman.y / this.tileHeight - 4);
+      if (goalY < 0) {
+        goalY = 0;
+      }
+      while (
+        this.tileMap.map[goalY][goalX] === 1 ||
+        this.tileMap.map[goalY][goalX] === undefined ||
+        this.tileMap.map[goalY][goalX] === -2
+      ) {
+        goalY++;
+      }
+    } else if (this.pacman.imageIndex[0] === MovingDirection.down) {
+      goalX = Math.round(this.pacman.x / this.tileWidth);
+      goalY = Math.round(this.pacman.y / this.tileHeight + 4);
+      if (goalY >= this.tileMap.map.length) {
+        goalY = this.tileMap.map.length - 1;
+      }
+
+      while (
+        this.tileMap.map[goalY][goalX] === 1 ||
+        this.tileMap.map[goalY][goalX] === undefined ||
+        this.tileMap.map[goalY][goalX] === -2
+      ) {
+        goalY--;
+      }
+    }
+    return [goalX, goalY];
+  }
+}

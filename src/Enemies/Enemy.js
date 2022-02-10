@@ -250,7 +250,6 @@ export default class Enemy {
         this.imageIndex[0] = MovingDirection.left;
         break;
       case MovingDirection.right:
-        console.log("moving right");
         this.x += this.velocity;
         this.imageIndex[0] = MovingDirection.right;
         break;

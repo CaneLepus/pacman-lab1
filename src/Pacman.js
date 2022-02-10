@@ -48,14 +48,6 @@ export default class Pacman {
         Number.isInteger(this.x / this.tileWidth) &&
         Number.isInteger(this.y / this.tileHeight)
       ) {
-        console.log(
-          "x: " +
-            this.x +
-            " y: " +
-            this.y +
-            " req: " +
-            this.requestedMovingDirection
-        );
         if (
           !this.tileMap.didCollideWithEnvironment(
             this.x,

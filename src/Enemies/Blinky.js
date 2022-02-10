@@ -20,11 +20,9 @@ export default class Blinky extends Enemy {
       Number.isInteger(this.y / this.tileHeight)
     ) {
       // if there are no future moves in the moves list.
-      if (this.moves === false || this.moves.length === 0) {
+      if (!(this.pacman.x === this.x && this.pacman.y === this.y)) {
         this.getPath();
-      }
-      // if there are future moves in the moves list
-      else {
+        // if there are future moves in the moves list
         this.movingDirection = this.moves.shift();
       }
     }
