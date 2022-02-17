@@ -1,4 +1,5 @@
 import MovingDirection from "/src/MovingDirection.js";
+import State from "/src/State.js";
 
 export default class Pacman {
   constructor(x, y, tileWidth, tileHeight, velocity, tileMap) {
@@ -17,6 +18,7 @@ export default class Pacman {
 
     this.chompSound = new Audio("/sounds/pacman_chomp.wav");
     this.powerDotSound = new Audio("/sounds/pacman_eatfruit.wav");
+    this.eatGhost = new Audio("/sounds/pacman_eatGhost.wav");
     this.powerDotActive = false;
     this.powerDotAboutToExpire = false;
     this.timers = [];
@@ -28,13 +30,14 @@ export default class Pacman {
     this.#loadImages();
   }
 
-  draw(ctx, pause) {
+  draw(ctx, pause, enemies) {
     if (!pause) {
       this.#move();
       this.#animate();
     }
     this.#eatDot();
     this.#eatPowerDot();
+    this.#eatGhost(enemies);
     ctx.drawImage(
       this.images[this.imageIndex[0]][this.imageIndex[1]],
       this.x,
@@ -214,6 +217,16 @@ export default class Pacman {
       }, 1000 * 3);
 
       this.timers.push(powerDotAboutToExpireTimer);
+    }
+  }
+
+  #eatGhost(enemies) {
+    if (this.powerDotActive) {
+      const collideEnemies = enemies.filter((enemy) => enemy.collideWith(this));
+      collideEnemies.forEach((enemy) => {
+        enemy.state = State.dead;
+        this.eatGhost.play();
+      });
     }
   }
 }

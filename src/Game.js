@@ -13,12 +13,9 @@ let pause = false;
 // the main game loop
 function gameLoop() {
   tileMap.draw(ctx);
-  pacman.draw(ctx, pause);
+  pacman.draw(ctx, pause, enemies);
   for (const enemy of enemies) {
     enemy.draw(ctx, pause);
-    if (enemy.collideWith(pacman)) {
-      gameOver();
-    }
   }
 }
 function gameOver() {

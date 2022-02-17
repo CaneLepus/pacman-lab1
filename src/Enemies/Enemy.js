@@ -22,6 +22,7 @@ export default class Enemy {
 
     this.imageIndex = [2, 0, 0];
     this.pacman = pacman;
+    this.state = State.normal;
   }
   draw(ctx) {
     this.#setState(this.pacman);
@@ -257,11 +258,12 @@ export default class Enemy {
   }
 
   #setState(pacman) {
-    if (pacman.powerDotActive) {
+    if (pacman.powerDotActive && this.state !== State.dead) {
+      this.state = State.scared;
       this.#isPowerDotAboutToExpire(pacman);
-    } else if (this.#isAngry()) {
+    } else if (this.state === State.angry) {
       this.imageIndex[2] = State.angry;
-    } else if (this.#isDead()) {
+    } else if (this.state === State.dead) {
       this.imageIndex[2] = State.dead;
     } else {
       this.imageIndex[2] = State.normal;
@@ -283,7 +285,4 @@ export default class Enemy {
       this.imageIndex[2] = State.scared;
     }
   }
-  #isAngry() {}
-
-  #isDead() {}
 }
