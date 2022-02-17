@@ -13,7 +13,14 @@ let pause = false;
 // the main game loop
 function gameLoop() {
   tileMap.draw(ctx);
-  pacman.draw(ctx, pause, enemies);
+  if (
+    !(
+      pacman.imageIndex[2] === 2 &&
+      pacman.imageIndex[1] === pacman.deathImages.length - 1
+    )
+  ) {
+    pacman.draw(ctx, pause, enemies);
+  }
   for (const enemy of enemies) {
     enemy.draw(ctx, pause);
   }
