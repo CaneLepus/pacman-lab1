@@ -1,5 +1,6 @@
 import Enemy from "/src/Enemies/Enemy.js";
 import PathFinding from "/src/PathFinding.js";
+import State from "/src/State.js";
 
 export default class Clyde extends Enemy {
   constructor(x, y, tileWidth, tileHeight, velocity, tileMap, pacman) {
@@ -53,7 +54,7 @@ export default class Clyde extends Enemy {
     ) {
       // set start and goal coordinates
       let start = [this.x / this.tileWidth, this.y / this.tileHeight];
-      this.setTargetTile();
+      this.setGoal();
       // create a copy of the gameboard grid
       let grid = JSON.parse(JSON.stringify(this.tileMap.map));
 
@@ -62,16 +63,22 @@ export default class Clyde extends Enemy {
     }
   }
   // method for deciding target tile based on rules for clydes movement.
-  setTargetTile() {
-    let diffX = this.pacman.x / this.tileWidth - this.x / this.tileWidth;
-    let diffY = this.pacman.y / this.tileHeight - this.y / this.tileHeight;
-    if (diffX > 8 || diffX < -8 || diffY > 8 || diffY < -8) {
-      this.goal = [
-        this.pacman.x / this.tileWidth,
-        this.pacman.y / this.tileHeight,
-      ];
-    } else {
+  setGoal() {
+    if (this.state === State.dead) {
+      this.goal = this.deadGoal;
+    } else if (this.state === State.scared) {
       this.goal = this.scatterGoal;
+    } else {
+      let diffX = this.pacman.x / this.tileWidth - this.x / this.tileWidth;
+      let diffY = this.pacman.y / this.tileHeight - this.y / this.tileHeight;
+      if (diffX > 8 || diffX < -8 || diffY > 8 || diffY < -8) {
+        this.goal = [
+          this.pacman.x / this.tileWidth,
+          this.pacman.y / this.tileHeight,
+        ];
+      } else {
+        this.goal = this.scatterGoal;
+      }
     }
   }
 }

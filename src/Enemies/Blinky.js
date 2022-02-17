@@ -1,3 +1,4 @@
+import State from "/src/State.js";
 import Enemy from "/src/Enemies/Enemy.js";
 import PathFinding from "/src/PathFinding.js";
 
@@ -7,6 +8,7 @@ export default class Blinky extends Enemy {
     this.moves = false;
     this.goal = [];
     super.loadImages("blinky");
+    this.scatterGoal = [26, 4];
   }
   draw(ctx, pause) {
     if (!pause) {
@@ -21,10 +23,14 @@ export default class Blinky extends Enemy {
       Number.isInteger(this.x / this.tileWidth) &&
       Number.isInteger(this.y / this.tileHeight)
     ) {
+      this.getPath();
       // if there are no future moves in the moves list.
-      if (!(this.pacman.x === this.x && this.pacman.y === this.y)) {
-        this.getPath();
-        // if there are future moves in the moves list
+      if (
+        !(
+          this.goal[0] === this.x / this.tileWidth &&
+          this.goal[1] === this.y / this.tileHeight
+        )
+      ) {
         this.movingDirection = this.moves.shift();
       }
     }
@@ -47,15 +53,24 @@ export default class Blinky extends Enemy {
     ) {
       // set start and goal coordinates
       let start = [this.x / this.tileWidth, this.y / this.tileHeight];
-      this.goal = [
-        this.pacman.x / this.tileWidth,
-        this.pacman.y / this.tileHeight,
-      ];
+      this.#setGoal();
       // create a copy of the gameboard grid
       let grid = JSON.parse(JSON.stringify(this.tileMap.map));
 
       // populate the moves list with moves
       this.moves = PathFinding(start, this.goal, grid, this.movingDirection);
+    }
+  }
+  #setGoal() {
+    if (this.state === State.dead) {
+      this.goal = this.deadGoal;
+    } else if (this.state === State.scared) {
+      this.goal = this.scatterGoal;
+    } else {
+      this.goal = [
+        this.pacman.x / this.tileWidth,
+        this.pacman.y / this.tileHeight,
+      ];
     }
   }
 }

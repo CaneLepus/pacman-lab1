@@ -1,6 +1,7 @@
 import Enemy from "/src/Enemies/Enemy.js";
 import PathFinding from "/src/PathFinding.js";
 import MovingDirection from "/src/MovingDirection.js";
+import State from "/src/State.js";
 
 export default class Inky extends Enemy {
   constructor(x, y, tileWidth, tileHeight, velocity, tileMap, pacman, blinky) {
@@ -8,6 +9,7 @@ export default class Inky extends Enemy {
     this.moves = false;
     this.goal = [];
     this.blinky = blinky;
+    this.scatterGoal = [26, 31];
     super.loadImages("inky");
   }
   draw(ctx, pause) {
@@ -49,7 +51,7 @@ export default class Inky extends Enemy {
   getPath() {
     // set start and goal coordinates
     let start = [this.x / this.tileWidth, this.y / this.tileHeight];
-    this.goal = this.getTargetCoordinates();
+    this.setGoal();
     // create a copy of the gameboard grid
     let grid = JSON.parse(JSON.stringify(this.tileMap.map));
 
@@ -57,91 +59,97 @@ export default class Inky extends Enemy {
     this.moves = PathFinding(start, this.goal, grid, this.movingDirection);
   }
   // method that determines the target tile based on rules for inkys movement
-  getTargetCoordinates() {
-    let goalX = 0;
-    let goalY = 0;
-    let offsetX = 0;
-    let offsetY = 0;
-    let blinkyDiffX = 0;
-    let blinkyDiffY = 0;
-    // if pacman is facing right
-    if (this.pacman.imageIndex[0] === MovingDirection.right) {
-      offsetX = Math.round(this.pacman.x / this.tileWidth + 2);
-      offsetY = Math.round(this.pacman.y / this.tileHeight);
-      blinkyDiffX = offsetX - Math.round(this.blinky.x / this.tileWidth);
-      blinkyDiffY = offsetY - Math.round(this.blinky.y / this.tileHeight);
+  setGoal() {
+    if (this.state === State.dead) {
+      this.goal = this.deadGoal;
+    } else if (this.state === State.scared) {
+      this.goal = this.scatterGoal;
+    } else {
+      let goalX = 0;
+      let goalY = 0;
+      let offsetX = 0;
+      let offsetY = 0;
+      let blinkyDiffX = 0;
+      let blinkyDiffY = 0;
+      // if pacman is facing right
+      if (this.pacman.imageIndex[0] === MovingDirection.right) {
+        offsetX = Math.round(this.pacman.x / this.tileWidth + 2);
+        offsetY = Math.round(this.pacman.y / this.tileHeight);
+        blinkyDiffX = offsetX - Math.round(this.blinky.x / this.tileWidth);
+        blinkyDiffY = offsetY - Math.round(this.blinky.y / this.tileHeight);
 
-      goalX = offsetX + blinkyDiffX;
-      goalY = offsetY + blinkyDiffY;
+        goalX = offsetX + blinkyDiffX;
+        goalY = offsetY + blinkyDiffY;
 
-      this.goal = this.setInBound(goalX, goalY);
+        this.goal = this.setInBound(goalX, goalY);
 
-      goalX = this.goal[0];
-      goalY = this.goal[1];
+        goalX = this.goal[0];
+        goalY = this.goal[1];
 
-      this.goal = this.findValid(goalX, goalY, blinkyDiffX + 2, blinkyDiffY);
+        this.goal = this.findValid(goalX, goalY, blinkyDiffX + 2, blinkyDiffY);
 
-      goalX = this.goal[0];
-      goalY = this.goal[1];
-      // if pacman is facing left
-    } else if (this.pacman.imageIndex[0] === MovingDirection.left) {
-      offsetX = Math.round(this.pacman.x / this.tileWidth - 2);
-      offsetY = Math.round(this.pacman.y / this.tileHeight);
+        goalX = this.goal[0];
+        goalY = this.goal[1];
+        // if pacman is facing left
+      } else if (this.pacman.imageIndex[0] === MovingDirection.left) {
+        offsetX = Math.round(this.pacman.x / this.tileWidth - 2);
+        offsetY = Math.round(this.pacman.y / this.tileHeight);
 
-      blinkyDiffX = offsetX - Math.round(this.blinky.x / this.tileWidth);
-      blinkyDiffY = offsetY - Math.round(this.blinky.y / this.tileHeight);
+        blinkyDiffX = offsetX - Math.round(this.blinky.x / this.tileWidth);
+        blinkyDiffY = offsetY - Math.round(this.blinky.y / this.tileHeight);
 
-      goalX = offsetX + blinkyDiffX;
-      goalY = offsetY + blinkyDiffY;
+        goalX = offsetX + blinkyDiffX;
+        goalY = offsetY + blinkyDiffY;
 
-      this.goal = this.setInBound(goalX, goalY);
+        this.goal = this.setInBound(goalX, goalY);
 
-      goalX = this.goal[0];
-      goalY = this.goal[1];
+        goalX = this.goal[0];
+        goalY = this.goal[1];
 
-      this.goal = this.findValid(goalX, goalY, blinkyDiffX - 2, blinkyDiffY);
+        this.goal = this.findValid(goalX, goalY, blinkyDiffX - 2, blinkyDiffY);
 
-      goalX = this.goal[0];
-      goalY = this.goal[1];
-      // if pacman is facing up
-    } else if (this.pacman.imageIndex[0] === MovingDirection.up) {
-      offsetX = Math.round(this.pacman.x / this.tileWidth);
-      offsetY = Math.round(this.pacman.y / this.tileHeight - 2);
+        goalX = this.goal[0];
+        goalY = this.goal[1];
+        // if pacman is facing up
+      } else if (this.pacman.imageIndex[0] === MovingDirection.up) {
+        offsetX = Math.round(this.pacman.x / this.tileWidth);
+        offsetY = Math.round(this.pacman.y / this.tileHeight - 2);
 
-      blinkyDiffX = offsetX - Math.round(this.blinky.x / this.tileWidth);
-      blinkyDiffY = offsetY - Math.round(this.blinky.y / this.tileHeight);
+        blinkyDiffX = offsetX - Math.round(this.blinky.x / this.tileWidth);
+        blinkyDiffY = offsetY - Math.round(this.blinky.y / this.tileHeight);
 
-      goalX = offsetX + blinkyDiffX;
-      goalY = offsetY + blinkyDiffY;
-      this.goal = this.setInBound(goalX, goalY);
+        goalX = offsetX + blinkyDiffX;
+        goalY = offsetY + blinkyDiffY;
+        this.goal = this.setInBound(goalX, goalY);
 
-      goalX = this.goal[0];
-      goalY = this.goal[1];
+        goalX = this.goal[0];
+        goalY = this.goal[1];
 
-      this.goal = this.findValid(goalX, goalY, blinkyDiffX, blinkyDiffY - 2);
+        this.goal = this.findValid(goalX, goalY, blinkyDiffX, blinkyDiffY - 2);
 
-      goalX = this.goal[0];
-      goalY = this.goal[1];
-      // if pacman is facing down
-    } else if (this.pacman.imageIndex[0] === MovingDirection.down) {
-      offsetX = Math.round(this.pacman.x / this.tileWidth);
-      offsetY = Math.round(this.pacman.y / this.tileHeight + 2);
+        goalX = this.goal[0];
+        goalY = this.goal[1];
+        // if pacman is facing down
+      } else if (this.pacman.imageIndex[0] === MovingDirection.down) {
+        offsetX = Math.round(this.pacman.x / this.tileWidth);
+        offsetY = Math.round(this.pacman.y / this.tileHeight + 2);
 
-      blinkyDiffX = offsetX - Math.round(this.blinky.x / this.tileWidth);
-      blinkyDiffY = offsetY - Math.round(this.blinky.y / this.tileHeight);
+        blinkyDiffX = offsetX - Math.round(this.blinky.x / this.tileWidth);
+        blinkyDiffY = offsetY - Math.round(this.blinky.y / this.tileHeight);
 
-      goalX = offsetX + blinkyDiffX;
-      goalY = offsetY + blinkyDiffY;
-      this.goal = this.setInBound(goalX, goalY);
-      goalX = this.goal[0];
-      goalY = this.goal[1];
+        goalX = offsetX + blinkyDiffX;
+        goalY = offsetY + blinkyDiffY;
+        this.goal = this.setInBound(goalX, goalY);
+        goalX = this.goal[0];
+        goalY = this.goal[1];
 
-      this.goal = this.findValid(goalX, goalY, blinkyDiffX, blinkyDiffY + 2);
+        this.goal = this.findValid(goalX, goalY, blinkyDiffX, blinkyDiffY + 2);
 
-      goalX = this.goal[0];
-      goalY = this.goal[1];
+        goalX = this.goal[0];
+        goalY = this.goal[1];
+      }
+      this.goal = [goalX, goalY];
     }
-    return [goalX, goalY];
   }
 
   // method that ensures the target is within the canvas

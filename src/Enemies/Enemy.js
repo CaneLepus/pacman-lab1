@@ -21,6 +21,7 @@ export default class Enemy {
     this.timers = [];
 
     this.imageIndex = [2, 0, 0];
+    this.deadGoal = [13, 17];
     this.pacman = pacman;
     this.state = State.normal;
   }
@@ -266,6 +267,7 @@ export default class Enemy {
     } else if (this.state === State.dead) {
       this.imageIndex[2] = State.dead;
     } else {
+      this.state = State.normal;
       this.imageIndex[2] = State.normal;
     }
   }
