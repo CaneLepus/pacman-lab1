@@ -23,7 +23,7 @@ export default class Enemy {
     this.imageIndex = [2, 0, 0];
     this.pacman = pacman;
   }
-  draw(ctx) {
+  draw(ctx, pause) {
     if (this.imageIndex[2] === State.normal) {
       ctx.drawImage(
         this.images[this.imageIndex[0]][this.imageIndex[1]],
@@ -68,12 +68,13 @@ export default class Enemy {
   }
 
   collideWith(pacman) {
-    const size = this.tileSize / 2;
+    const sizeX = this.tileWidth / 2;
+    const sizeY = this.tileHeight / 2;
     if (
-      this.x < pacman.x + size &&
-      this.x + size > pacman.x &&
-      this.y < pacman.y + size &&
-      this.y + size > pacman.y
+      this.x < pacman.x + sizeX &&
+      this.x + sizeX > pacman.x &&
+      this.y < pacman.y + sizeY &&
+      this.y + sizeY > pacman.y
     ) {
       return true;
     }

@@ -9,9 +9,11 @@ export default class Pinky extends Enemy {
     this.goal = [];
     super.loadImages("pinky");
   }
-  draw(ctx) {
-    this.move();
-    this.animate();
+  draw(ctx, pause) {
+    if (!pause) {
+      this.move();
+      this.animate();
+    }
     super.draw(ctx);
   }
 

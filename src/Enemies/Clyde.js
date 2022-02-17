@@ -9,9 +9,11 @@ export default class Clyde extends Enemy {
     this.scatterGoal = [1, 31];
     super.loadImages("clyde");
   }
-  draw(ctx) {
-    this.move();
-    this.animate();
+  draw(ctx, pause) {
+    if (!pause) {
+      this.move();
+      this.animate();
+    }
     super.draw(ctx);
   }
 

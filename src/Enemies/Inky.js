@@ -10,9 +10,11 @@ export default class Inky extends Enemy {
     this.blinky = blinky;
     super.loadImages("inky");
   }
-  draw(ctx) {
-    this.move();
-    this.animate();
+  draw(ctx, pause) {
+    if (!pause) {
+      this.move();
+      this.animate();
+    }
     super.draw(ctx);
   }
 

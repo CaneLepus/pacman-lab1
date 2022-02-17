@@ -8,9 +8,11 @@ export default class Blinky extends Enemy {
     this.goal = [];
     super.loadImages("blinky");
   }
-  draw(ctx) {
-    this.move();
-    this.animate();
+  draw(ctx, pause) {
+    if (!pause) {
+      this.move();
+      this.animate();
+    }
     super.draw(ctx);
   }
   move() {

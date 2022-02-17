@@ -28,9 +28,11 @@ export default class Pacman {
     this.#loadImages();
   }
 
-  draw(ctx) {
-    this.#move();
-    this.#animate();
+  draw(ctx, pause) {
+    if (!pause) {
+      this.#move();
+      this.#animate();
+    }
     this.#eatDot();
     this.#eatPowerDot();
     ctx.drawImage(
