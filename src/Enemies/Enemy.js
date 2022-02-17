@@ -266,6 +266,12 @@ export default class Enemy {
       this.imageIndex[2] = State.angry;
     } else if (this.state === State.dead) {
       this.imageIndex[2] = State.dead;
+      if (
+        this.x / this.tileWidth === this.deadGoal[0] &&
+        this.y / this.tileHeight === this.deadGoal[1]
+      ) {
+        this.state = State.normal;
+      }
     } else {
       this.state = State.normal;
       this.imageIndex[2] = State.normal;
