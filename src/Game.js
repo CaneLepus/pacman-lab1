@@ -2,13 +2,15 @@ import TileMap from "/src/TileMap.js";
 
 const velocity = 4;
 const enemyVelocity = 2;
+let loop;
 
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
-const tileMap = new TileMap(canvas.width, canvas.height);
-const pacman = tileMap.getPacman(velocity);
-const enemies = tileMap.getEnemies(enemyVelocity);
-const startSound = new Audio("/sounds/pacman_beginning.wav");
+let canvas;
+let ctx;
+let tileMap;
+let pacman;
+let enemies;
+let startSound;
+
 let pause = false;
 let player = "";
 
@@ -17,7 +19,9 @@ window.onload = function () {
   let canvas = document.getElementById("gameCanvas");
   let gameOver = document.getElementById("gameOver");
   let startButton = document.getElementById("startButton");
+  let restartButton = document.getElementById("restartButton");
   startButton.addEventListener("click", startGame);
+  restartButton.addEventListener("click", startGame);
   start.style.display = "block";
   canvas.style.display = "none";
   gameOver.style.display = "none";
@@ -33,16 +37,25 @@ function gameLoop() {
     )
   ) {
     pacman.draw(ctx, pause, enemies);
+  } else {
+    gameOver();
   }
   for (const enemy of enemies) {
     enemy.draw(ctx, pause);
   }
 }
 function gameOver() {
-  pause = true;
+  let start = document.getElementById("start");
+  let canvas = document.getElementById("gameCanvas");
+  let gameOver = document.getElementById("gameOver");
+  start.style.display = "none";
+  canvas.style.display = "none";
+  gameOver.style.display = "block";
+  clearInterval(loop);
 }
 
 function startGame() {
+  init();
   startSound.play();
   let start = document.getElementById("start");
   let canvas = document.getElementById("gameCanvas");
@@ -53,5 +66,13 @@ function startGame() {
   canvas.style.display = "block";
   gameOver.style.display = "none";
   // calls the game loop 75 times per second.
-  setInterval(gameLoop, 1000 / 75);
+  loop = setInterval(gameLoop, 1000 / 75);
+}
+function init() {
+  canvas = document.getElementById("gameCanvas");
+  ctx = canvas.getContext("2d");
+  tileMap = new TileMap(canvas.width, canvas.height);
+  pacman = tileMap.getPacman(velocity);
+  enemies = tileMap.getEnemies(enemyVelocity);
+  startSound = new Audio("/sounds/pacman_beginning.wav");
 }

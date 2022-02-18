@@ -19,6 +19,7 @@ export default class Pacman {
     this.chompSound = new Audio("/sounds/pacman_chomp.wav");
     this.powerDotSound = new Audio("/sounds/pacman_eatfruit.wav");
     this.eatGhost = new Audio("/sounds/pacman_eatGhost.wav");
+    this.deathSound = new Audio("/sounds/pacman_death.wav");
     this.powerDotActive = false;
     this.powerDotAboutToExpire = false;
     this.powerTimers = [];
@@ -36,13 +37,13 @@ export default class Pacman {
     if (!pause) {
       if (this.lives > 0) {
         this.#move();
+        this.#takeDamage(enemies);
       }
       this.#animate();
     }
     this.#eatDot();
     this.#eatPowerDot();
     this.#eatGhost(enemies);
-    this.#takeDamage(enemies);
     if (this.imageIndex[2] === 0) {
       ctx.drawImage(
         this.images[this.imageIndex[0]][this.imageIndex[1]],
@@ -362,6 +363,7 @@ export default class Pacman {
         this.imageIndex[2] = 1;
         this.damageTaken = 6;
         if (this.lives === 0) {
+          this.deathSound.play();
           this.imageIndex[2] = 2;
           this.imageIndex[1] = 0;
         }
