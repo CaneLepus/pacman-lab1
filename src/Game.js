@@ -8,7 +8,20 @@ const ctx = canvas.getContext("2d");
 const tileMap = new TileMap(canvas.width, canvas.height);
 const pacman = tileMap.getPacman(velocity);
 const enemies = tileMap.getEnemies(enemyVelocity);
+const startSound = new Audio("/sounds/pacman_beginning.wav");
 let pause = false;
+let player = "";
+
+window.onload = function () {
+  let start = document.getElementById("start");
+  let canvas = document.getElementById("gameCanvas");
+  let gameOver = document.getElementById("gameOver");
+  let startButton = document.getElementById("startButton");
+  startButton.addEventListener("click", startGame);
+  start.style.display = "block";
+  canvas.style.display = "none";
+  gameOver.style.display = "none";
+};
 
 // the main game loop
 function gameLoop() {
@@ -29,5 +42,16 @@ function gameOver() {
   pause = true;
 }
 
-// calls the game loop 75 times per second.
-setInterval(gameLoop, 1000 / 75);
+function startGame() {
+  startSound.play();
+  let start = document.getElementById("start");
+  let canvas = document.getElementById("gameCanvas");
+  let gameOver = document.getElementById("gameOver");
+  player = document.getElementById("pname").value;
+  console.log(player);
+  start.style.display = "none";
+  canvas.style.display = "block";
+  gameOver.style.display = "none";
+  // calls the game loop 75 times per second.
+  setInterval(gameLoop, 1000 / 75);
+}
