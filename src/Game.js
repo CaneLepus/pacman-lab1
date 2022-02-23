@@ -1,4 +1,5 @@
 import TileMap from "/src/TileMap.js";
+import ScoreHandler from "/src/scoreHandler.js";
 
 const velocity = 4;
 const enemyVelocity = 2;
@@ -11,20 +12,31 @@ let pacman;
 let enemies;
 let startSound;
 
+let startDiv;
+let canvasDiv;
+let gameOverDiv;
+let highscoreDiv;
+
 let pause = false;
 let player = "";
+let scoreHandler = new ScoreHandler();
 
 window.onload = function () {
-  let start = document.getElementById("start");
-  let canvas = document.getElementById("gameCanvas");
-  let gameOver = document.getElementById("gameOver");
+  startDiv = document.getElementById("start");
+  canvasDiv = document.getElementById("gameCanvas");
+  gameOverDiv = document.getElementById("gameOver");
+  highscoreDiv = document.getElementById("highscore");
   let startButton = document.getElementById("startButton");
   let restartButton = document.getElementById("restartButton");
+  let highscoreButton = document.getElementById("highscoreButton");
+  let startMenuButton = document.getElementById("startMenuButton");
   startButton.addEventListener("click", startGame);
   restartButton.addEventListener("click", startGame);
-  start.style.display = "block";
-  canvas.style.display = "none";
-  gameOver.style.display = "none";
+  highscoreButton.addEventListener("click", highscores);
+  startMenuButton.addEventListener("click", startMenu);
+  startDiv.style.display = "block";
+  canvasDiv.style.display = "none";
+  gameOverDiv.style.display = "none";
 };
 
 // the main game loop
@@ -45,28 +57,39 @@ function gameLoop() {
   }
 }
 function gameOver() {
-  let start = document.getElementById("start");
-  let canvas = document.getElementById("gameCanvas");
-  let gameOver = document.getElementById("gameOver");
-  start.style.display = "none";
-  canvas.style.display = "none";
-  gameOver.style.display = "block";
+  startDiv.style.display = "none";
+  canvasDiv.style.display = "none";
+  gameOverDiv.style.display = "block";
+  highscoreDiv.style.display = "none";
   clearInterval(loop);
 }
 
 function startGame() {
   init();
   startSound.play();
-  let start = document.getElementById("start");
-  let canvas = document.getElementById("gameCanvas");
-  let gameOver = document.getElementById("gameOver");
-  player = document.getElementById("pname").value;
+  ScoreHandler.player = document.getElementById("pname").value;
+  ScoreHandler.score = 0;
   console.log(player);
-  start.style.display = "none";
-  canvas.style.display = "block";
-  gameOver.style.display = "none";
+  startDiv.style.display = "none";
+  canvasDiv.style.display = "block";
+  gameOverDiv.style.display = "none";
+  highscoreDiv.style.display = "none";
   // calls the game loop 75 times per second.
   loop = setInterval(gameLoop, 1000 / 75);
+}
+
+function highscores(){
+  scoreHandler.highscores();
+  startDiv.style.display = "none";
+  canvasDiv.style.display = "none";
+  gameOverDiv.style.display = "none";
+  highscoreDiv.style.display = "block";
+}
+function startMenu(){
+  startDiv.style.display = "block";
+  canvasDiv.style.display = "none";
+  gameOverDiv.style.display = "none";
+  highscoreDiv.style.display = "none";
 }
 function init() {
   canvas = document.getElementById("gameCanvas");
