@@ -1,5 +1,6 @@
 import TileMap from "/src/TileMap.js";
-import ScoreHandler from "/src/scoreHandler.js";
+import Scorehandler from "/src/scoreHandler.js";
+
 
 const velocity = 4;
 const enemyVelocity = 2;
@@ -16,10 +17,9 @@ let startDiv;
 let canvasDiv;
 let gameOverDiv;
 let highscoreDiv;
+let scoreHandler;
 
 let pause = false;
-let player = "";
-let scoreHandler = new ScoreHandler();
 
 window.onload = function () {
   startDiv = document.getElementById("start");
@@ -37,6 +37,7 @@ window.onload = function () {
   startDiv.style.display = "block";
   canvasDiv.style.display = "none";
   gameOverDiv.style.display = "none";
+  scoreHandler = new Scorehandler();
 };
 
 // the main game loop
@@ -57,6 +58,7 @@ function gameLoop() {
   }
 }
 function gameOver() {
+  scoreHandler.saveScore(pacman.score);
   startDiv.style.display = "none";
   canvasDiv.style.display = "none";
   gameOverDiv.style.display = "block";
@@ -67,9 +69,6 @@ function gameOver() {
 function startGame() {
   init();
   startSound.play();
-  ScoreHandler.player = document.getElementById("pname").value;
-  ScoreHandler.score = 0;
-  console.log(player);
   startDiv.style.display = "none";
   canvasDiv.style.display = "block";
   gameOverDiv.style.display = "none";
@@ -79,7 +78,7 @@ function startGame() {
 }
 
 function highscores(){
-  scoreHandler.highscores();
+  scoreHandler.printScores();
   startDiv.style.display = "none";
   canvasDiv.style.display = "none";
   gameOverDiv.style.display = "none";
@@ -98,4 +97,5 @@ function init() {
   pacman = tileMap.getPacman(velocity);
   enemies = tileMap.getEnemies(enemyVelocity);
   startSound = new Audio("/sounds/pacman_beginning.wav");
+  scoreHandler.setName(document.getElementById("pname").value);
 }

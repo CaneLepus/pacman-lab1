@@ -1,20 +1,27 @@
 import MovingDirection from "/src/MovingDirection.js";
 import State from "/src/State.js";
+import ScoreHandler from './ScoreHandler.js';
 
 export default class Pacman {
   constructor(x, y, tileWidth, tileHeight, velocity, tileMap) {
+    this.score = 0;
     this.x = x;
     this.y = y;
     this.tileWidth = tileWidth;
     this.tileHeight = tileHeight;
     this.velocity = velocity;
     this.tileMap = tileMap;
+    this.ghostMultiplier = 1;
+
 
     this.currentMovingDirection = null;
     this.requestedMovingDirection = null;
 
+    this.scoreHandler = new ScoreHandler();
+
     this.defaultAnimationTimer = 10;
-    this.animationTimer = null;
+    this.animationTimer = this.defaultAnimationTimer;
+    this.pauseAnimate = true;
 
     this.chompSound = new Audio("/sounds/pacman_chomp.wav");
     this.powerDotSound = new Audio("/sounds/pacman_eatfruit.wav");
@@ -95,15 +102,15 @@ export default class Pacman {
         this.currentMovingDirection
       )
     ) {
-      this.animationTimer = null;
+      this.pauseAnimate = true;
       this.imageIndex[0] = this.currentMovingDirection;
       this.imageIndex[1] = 0;
       return;
     } else if (
       this.currentMovingDirection != null &&
-      this.animationTimer == null
+      this.pauseAnimate == true
     ) {
-      this.animationTimer = this.defaultAnimationTimer;
+      this.pauseAnimate = false;
     }
 
     switch (this.currentMovingDirection) {
@@ -130,9 +137,6 @@ export default class Pacman {
   // loops through all images of the player according to the direction he is moving
   // this creates the animated effect of the player eating his way forward.
   #animate() {
-    if (this.animationTimer == null) {
-      return;
-    }
     this.animationTimer--;
     if (this.animationTimer === 0) {
       this.animationTimer = this.defaultAnimationTimer;
@@ -146,12 +150,12 @@ export default class Pacman {
       } else if (this.imageIndex[2] === 1) {
         this.imageIndex[2] = 0;
       }
-      if (this.lives > 0) {
+      if (this.lives > 0 && !this.pauseAnimate) {
         this.imageIndex[1]++;
         if (this.imageIndex[1] === this.images[this.imageIndex[0]].length) {
           this.imageIndex[1] = 0;
         }
-      } else {
+      } else if(this.lives <= 0){
         this.imageIndex[1]++;
         if (this.imageIndex[1] === this.deathImages.length) {
           this.imageIndex[1] = 0;
@@ -317,6 +321,7 @@ export default class Pacman {
   // checks if player eats a dot and if so plays sound.
   #eatDot() {
     if (this.tileMap.eatDot(this.x, this.y)) {
+      this.score += 10;
       this.chompSound.play();
     }
   }
@@ -324,6 +329,7 @@ export default class Pacman {
   //plays sound and starts timer for when the effect expires.
   #eatPowerDot() {
     if (this.tileMap.eatPowerDot(this.x, this.y)) {
+      this.score += 50;
       this.powerDotSound.play();
       this.powerDotActive = true;
       this.powerDotAboutToExpire = false;
@@ -333,6 +339,7 @@ export default class Pacman {
       let powerDotTimer = setTimeout(() => {
         this.powerDotActive = false;
         this.powerDotAboutToExpire = false;
+        this.ghostMultiplier = 1;
       }, 1000 * 6);
 
       this.powerTimers.push(powerDotTimer);
@@ -349,8 +356,12 @@ export default class Pacman {
     if (this.powerDotActive) {
       const collideEnemies = enemies.filter((enemy) => enemy.collideWith(this));
       collideEnemies.forEach((enemy) => {
+        if (enemy.state !== State.dead){
+          this.score += 200 * this.ghostMultiplier;
+        this.ghostMultiplier *= 2;
         enemy.state = State.dead;
         this.eatGhost.play();
+        }
       });
     }
   }
