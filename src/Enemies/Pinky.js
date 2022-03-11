@@ -4,8 +4,8 @@ import MovingDirection from "/src/MovingDirection.js";
 import State from "/src/State.js";
 
 export default class Pinky extends Enemy {
-  constructor(x, y, tileWidth, tileHeight, velocity, tileMap, pacman) {
-    super(x, y, tileWidth, tileHeight, velocity, tileMap, pacman);
+  constructor(x, y, tileWidth, tileHeight, settings, tileMap, pacman) {
+    super(x, y, tileWidth, tileHeight, settings, tileMap, pacman);
     this.moves = false;
     this.goal = [];
     this.scatterGoal = [1, 4];
@@ -24,7 +24,7 @@ export default class Pinky extends Enemy {
 
     if (
       Number.isInteger(this.x / this.tileWidth) &&
-      Number.isInteger(this.y / this.tileHeight)
+      Number.isInteger(this.y / this.tileHeight) || !this.moves
     ) {
       this.getPath();
       // if the target tile is not the current

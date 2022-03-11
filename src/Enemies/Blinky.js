@@ -3,8 +3,8 @@ import Enemy from "/src/Enemies/Enemy.js";
 import PathFinding from "/src/PathFinding.js";
 
 export default class Blinky extends Enemy {
-  constructor(x, y, tileWidth, tileHeight, velocity, tileMap, pacman) {
-    super(x, y, tileWidth, tileHeight, velocity, tileMap, pacman);
+  constructor(x, y, tileWidth, tileHeight, settings, tileMap, pacman) {
+    super(x, y, tileWidth, tileHeight, settings, tileMap, pacman);
     this.moves = false;
     this.goal = [];
     super.loadImages("blinky");
@@ -24,7 +24,7 @@ export default class Blinky extends Enemy {
       Number.isInteger(this.y / this.tileHeight)
     ) {
       this.getPath();
-      // if there are no future moves in the moves list.
+      // if there are future moves in the moves list.
       if (
         !(
           this.goal[0] === this.x / this.tileWidth &&
@@ -32,6 +32,7 @@ export default class Blinky extends Enemy {
         )
       ) {
         this.movingDirection = this.moves.shift();
+        console.log(this.movingDirection);
       }
     }
     // if blinky wont collide with a wall by moving in decided direction.
@@ -49,7 +50,7 @@ export default class Blinky extends Enemy {
     // if pacman is entirely inside a tile
     if (
       Number.isInteger(this.pacman.x / this.tileWidth) &&
-      Number.isInteger(this.pacman.y / this.tileHeight)
+      Number.isInteger(this.pacman.y / this.tileHeight) || !this.moves
     ) {
       // set start and goal coordinates
       let start = [this.x / this.tileWidth, this.y / this.tileHeight];

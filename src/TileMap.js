@@ -7,6 +7,7 @@ import MovingDirection from "/src/MovingDirection.js";
 
 export default class TileMap {
   constructor(canvasWidth, canvasHeight) {
+
     this.tileWidth = canvasWidth / this.map[0].length;
     this.tileHeight = canvasHeight / this.map.length;
 
@@ -15,6 +16,9 @@ export default class TileMap {
 
     this.dot = new Image();
     this.dot.src = "/images/dots/dot.png";
+
+    this.life = new Image();
+    this.life.src = "/images/pacman/right_1.png";
 
     this.powerDot0 = new Image();
     this.powerDot0.src = "/images/dots/power_0.png";
@@ -32,13 +36,13 @@ export default class TileMap {
   // 0 - dot
   // 1 - wall
   // 2 - power-dot
-  // 3 - entry ghost lair
+  // 3 - life
   // 4 - pacman
   // 5 - blinky
   // 6 - pinky
   // 7 - inky
   // 8 - clyde
-  // 9 - fruit
+  // 9 - scoreText
   map = [
     [
       -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
@@ -49,7 +53,7 @@ export default class TileMap {
       -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
     ],
     [
-      -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+      9, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
       -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
     ],
     [
@@ -102,12 +106,12 @@ export default class TileMap {
       1, 1, 1, 1, 1, 1,
     ],
     [
-      1, 1, 1, 1, 1, 1, 0, 1, 1, -1, 1, 1, 1, 3, 3, 1, 1, 1, -1, 1, 1, 0, 1, 1,
+      1, 1, 1, 1, 1, 1, 0, 1, 1, -1, 1, 1, 1, -2, -2, 1, 1, 1, -1, 1, 1, 0, 1, 1,
       1, 1, 1, 1,
     ],
     [
-      -1, -1, -1, -1, -1, -1, 0, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, 1, -1,
-      -1, -1, 0, -1, -1, -1, -1, -1, -1,
+      1, -1, -1, -1, -1, -1, 0, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, 1, -1,
+      -1, -1, 0, -1, -1, -1, -1, -1, 1,
     ],
     [
       1, 1, 1, 1, 1, 1, 0, 1, 1, -1, 1, -1, 7, 6, 8, -1, -1, 1, -1, 1, 1, 0, 1,
@@ -176,7 +180,7 @@ export default class TileMap {
     ],
     [
       -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
-      -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+      -2, -2, -2, -2, -2, -2, -2, 3, 3, 3,
     ],
     [
       -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
@@ -184,7 +188,7 @@ export default class TileMap {
     ],
   ];
 
-  draw(ctx) {
+  draw(ctx, score) {
     for (let row = 0; row < this.map.length; row++) {
       for (let column = 0; column < this.map[row].length; column++) {
         let tile = this.map[row][column];
@@ -197,6 +201,10 @@ export default class TileMap {
           this.#drawWall(ctx, column, row, this.tileWidth, this.tileHeight);
         } else if (tile === 2) {
           this.#drawPowerDot(ctx, column, row, this.tileWidth, this.tileHeight);
+        } else if (tile === 3) {
+          this.#drawLife(ctx, column, row, this.tileWidth, this.tileHeight);
+        } else if (tile === 9) {
+          this.#drawScore(ctx, column, row, this.tileWidth, this.tileHeight, score);
         }
       }
     }
@@ -332,6 +340,14 @@ export default class TileMap {
     }
   }
 
+  didCompleteCourse() {
+    return this.#dotsLeft() === 0;
+  }
+
+  #dotsLeft() {
+    return this.map.flat().filter((tile) => tile === 0).length;
+  }
+
   // returns true and converts tile to a blank tile if
   // provided coordinates match a tile with a dot.
   eatDot(x, y) {
@@ -402,5 +418,19 @@ export default class TileMap {
   #drawBlank(ctx, column, row, width, height) {
     ctx.fillStyle = "black";
     ctx.fillRect(column * width, row * height, width, height);
+  }
+  #drawScore(ctx, column, row, width, height, score) {
+    ctx.fillStyle = "white";
+    ctx.font = "30px Comic Sans MS";
+    ctx.fillText("Score: " + score, column * width, row * height);
+  }
+  #drawLife(ctx, column, row, width, height) {
+    ctx.drawImage(
+      this.life,
+      column * width,
+      row * height,
+      width,
+      height
+    );
   }
 }

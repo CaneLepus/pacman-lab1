@@ -3,8 +3,8 @@ import PathFinding from "/src/PathFinding.js";
 import State from "/src/State.js";
 
 export default class Clyde extends Enemy {
-  constructor(x, y, tileWidth, tileHeight, velocity, tileMap, pacman) {
-    super(x, y, tileWidth, tileHeight, velocity, tileMap, pacman);
+  constructor(x, y, tileWidth, tileHeight, settings, tileMap, pacman) {
+    super(x, y, tileWidth, tileHeight, settings, tileMap, pacman);
     this.moves = false;
     this.goal = [];
     this.scatterGoal = [1, 31];
@@ -29,7 +29,7 @@ export default class Clyde extends Enemy {
       if (
         !(
           this.goal[0] === this.x / this.tileWidth &&
-          this.goal[1] === this.y / this.tileHeight
+          this.goal[1] === this.y / this.tileHeight || !this.moves
         )
       ) {
         this.movingDirection = this.moves.shift();

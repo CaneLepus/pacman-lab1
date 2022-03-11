@@ -30,7 +30,7 @@ export default class Pacman {
     this.powerDotActive = false;
     this.powerDotAboutToExpire = false;
     this.powerTimers = [];
-    this.damageTaken = 0;
+    this.damageTakenTimer = 0;
     this.lives = 3;
 
     this.imageIndex = [2, 0, 0];
@@ -140,8 +140,8 @@ export default class Pacman {
     this.animationTimer--;
     if (this.animationTimer === 0) {
       this.animationTimer = this.defaultAnimationTimer;
-      if (this.damageTaken > 0 && this.imageIndex[2] !== 2) {
-        this.damageTaken--;
+      if (this.damageTakenTimer > 0 && this.imageIndex[2] !== 2) {
+        this.damageTakenTimer--;
         if (this.imageIndex[2] === 1) {
           this.imageIndex[2] = 0;
         } else {
@@ -155,7 +155,7 @@ export default class Pacman {
         if (this.imageIndex[1] === this.images[this.imageIndex[0]].length) {
           this.imageIndex[1] = 0;
         }
-      } else if(this.lives <= 0){
+      } else if (this.lives <= 0) {
         this.imageIndex[1]++;
         if (this.imageIndex[1] === this.deathImages.length) {
           this.imageIndex[1] = 0;
@@ -356,23 +356,27 @@ export default class Pacman {
     if (this.powerDotActive) {
       const collideEnemies = enemies.filter((enemy) => enemy.collideWith(this));
       collideEnemies.forEach((enemy) => {
-        if (enemy.state !== State.dead){
+        if (enemy.state !== State.dead) {
           this.score += 200 * this.ghostMultiplier;
-        this.ghostMultiplier *= 2;
-        enemy.state = State.dead;
-        this.eatGhost.play();
+          this.ghostMultiplier *= 2;
+          enemy.state = State.dead;
+          this.eatGhost.play();
         }
       });
     }
   }
   #takeDamage(enemies) {
-    if (!this.powerDotActive && this.damageTaken === 0) {
+    if (!this.powerDotActive && this.damageTakenTimer === 0) {
       const collideEnemies = enemies.filter((enemy) => enemy.collideWith(this));
 
       collideEnemies.forEach((enemy) => {
-        this.lives--;
-        this.imageIndex[2] = 1;
-        this.damageTaken = 6;
+        if (enemy.state !== State.dead) {
+          this.tileMap.map[33][this.tileMap.map[33].length - this.lives] = -2;
+          this.lives--;
+          this.imageIndex[2] = 1;
+          this.damageTakenTimer = 6;
+        }
+
         if (this.lives === 0) {
           this.deathSound.play();
           this.imageIndex[2] = 2;

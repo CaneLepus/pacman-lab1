@@ -3,6 +3,8 @@ import State from "/src/State.js";
 
 export default class Enemy {
   constructor(x, y, tileWidth, tileHeight, velocity, tileMap, pacman) {
+    console.log("creating enemy");
+    this.baseSpeed = 2;
     this.x = x;
     this.y = y;
     this.tileWidth = tileWidth;

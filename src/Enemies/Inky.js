@@ -4,8 +4,8 @@ import MovingDirection from "/src/MovingDirection.js";
 import State from "/src/State.js";
 
 export default class Inky extends Enemy {
-  constructor(x, y, tileWidth, tileHeight, velocity, tileMap, pacman, blinky) {
-    super(x, y, tileWidth, tileHeight, velocity, tileMap, pacman);
+  constructor(x, y, tileWidth, tileHeight, settings, tileMap, pacman, blinky) {
+    super(x, y, tileWidth, tileHeight, settings, tileMap, pacman);
     this.moves = false;
     this.goal = [];
     this.blinky = blinky;
@@ -31,7 +31,7 @@ export default class Inky extends Enemy {
       if (
         !(
           this.goal[0] === this.x / this.tileWidth &&
-          this.goal[1] === this.y / this.tileHeight
+          this.goal[1] === this.y / this.tileHeight || !this.moves
         )
       ) {
         this.movingDirection = this.moves.shift();
