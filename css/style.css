@@ -3,7 +3,8 @@
   position: relative;
   padding: 0;
   margin: auto;
-  width: 70%;
+  width: 80%;
+  max-width: 1000px;
   height: auto;
   text-align: center;
   background-color: black;

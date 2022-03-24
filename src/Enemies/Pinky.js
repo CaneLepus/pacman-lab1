@@ -21,7 +21,6 @@ export default class Pinky extends Enemy {
 
   move() {
     // if pinky is entirely inside a tile
-
     if (
       Number.isInteger(this.x / this.tileWidth) &&
       Number.isInteger(this.y / this.tileHeight) || !this.moves
